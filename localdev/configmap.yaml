@@ -203,15 +203,22 @@ addons:
         extraArgs:
         - --insecure
         - --repo-server-plaintext
+        - --redis=redis:6379
       repoServer:
         extraArgs:
         - --disable-tls
+        - --redis=redis:6379
       controller:
         extraArgs:
         - --repo-server-plaintext
+        - --redis=redis:6379
       redis-bb:
-        networkPolicy:
-          enabled: false
+        enabled: false
+      redis:
+        enabled: false
+      externalRedis:
+        host: redis
+        port: 6379
 
   keycloak:
     enabled: true
