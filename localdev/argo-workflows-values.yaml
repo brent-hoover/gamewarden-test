@@ -1,0 +1,35 @@
+controller:
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+
+server:
+  enabled: true
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 500m
+  extraArgs:
+  - --auth-mode=server
+
+executor:
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 10m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+
+# Disable features we don't need
+artifactRepository:
+  s3: null
+  
+singleNamespace: false
