@@ -1,0 +1,118 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: script-failure-workflow-
+  namespace: argo-workflows
+spec:
+  entrypoint: script-fail-example
+  arguments:
+    parameters:
+    - name: input-file
+      value: "/data/input.json"
+    - name: output-dir
+      value: "/data/output"
+    - name: batch-size
+      value: "100"
+    - name: processing-mode
+      value: "strict"
+  
+  templates:
+  - name: script-fail-example
+    inputs:
+      parameters:
+      - name: input-file
+      - name: output-dir
+      - name: batch-size
+      - name: processing-mode
+    steps:
+    - - name: validate-inputs
+        template: validate-params
+        arguments:
+          parameters:
+          - name: input-file
+            value: "{{inputs.parameters.input-file}}"
+          - name: output-dir
+            value: "{{inputs.parameters.output-dir}}"
+    - - name: execute-script
+        template: run-bash-script
+        arguments:
+          parameters:
+          - name: input-file
+            value: "{{inputs.parameters.input-file}}"
+          - name: output-dir
+            value: "{{inputs.parameters.output-dir}}"
+          - name: batch-size
+            value: "{{inputs.parameters.batch-size}}"
+          - name: processing-mode
+            value: "{{inputs.parameters.processing-mode}}"
+
+  - name: validate-params
+    inputs:
+      parameters:
+      - name: input-file
+      - name: output-dir
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args:
+        - |
+          echo "Validating input parameters..."
+          echo "Input file: {{inputs.parameters.input-file}}"
+          echo "Output directory: {{inputs.parameters.output-dir}}"
+          echo "Validation passed!"
+
+  - name: run-bash-script
+    inputs:
+      parameters:
+      - name: input-file
+      - name: output-dir  
+      - name: batch-size
+      - name: processing-mode
+    container:
+      image: alpine:latest
+      command: ["/bin/sh"]
+      args:
+        - -c
+        - |
+          # This simulates a bash script that would normally be in the container image
+          # In a real scenario, this would be: /app/process-data.sh
+          
+          echo "==============================================="
+          echo "Executing data processing script"
+          echo "==============================================="
+          echo "Parameters received:"
+          echo "  Input file: {{inputs.parameters.input-file}}"
+          echo "  Output dir: {{inputs.parameters.output-dir}}"
+          echo "  Batch size: {{inputs.parameters.batch-size}}"
+          echo "  Mode: {{inputs.parameters.processing-mode}}"
+          echo ""
+          
+          # Simulate processing steps
+          echo "[$(date)] Starting data processing..."
+          sleep 1
+          
+          echo "[$(date)] Reading input file: {{inputs.parameters.input-file}}"
+          sleep 1
+          
+          echo "[$(date)] Processing batch 1 with size {{inputs.parameters.batch-size}}"
+          sleep 1
+          
+          echo "[$(date)] Processing batch 2 with size {{inputs.parameters.batch-size}}"
+          sleep 1
+          
+          # Simulate a failure in the bash script
+          echo "[$(date)] ERROR: Encountered corrupted data in batch 3"
+          echo "[$(date)] Attempting recovery..."
+          sleep 1
+          
+          # Check if we're in strict mode
+          if [ "{{inputs.parameters.processing-mode}}" = "strict" ]; then
+              echo "[$(date)] FATAL: Script cannot continue in strict mode"
+              echo "[$(date)] Error details: Invalid checksum for data block 0x3F2A"
+              echo "[$(date)] Script exiting with error code 127"
+              exit 127
+          else
+              echo "[$(date)] WARNING: Continuing in lenient mode"
+              echo "[$(date)] Script completed with warnings"
+              exit 0
+          fi

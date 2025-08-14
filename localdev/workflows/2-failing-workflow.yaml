@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: failing-workflow-
+  namespace: argo-workflows
+spec:
+  entrypoint: fail-example
+  templates:
+  - name: fail-example
+    dag:
+      tasks:
+      - name: task-1
+        template: successful-task
+      - name: task-2
+        template: failing-task
+        dependencies: [task-1]
+      - name: task-3
+        template: never-runs
+        dependencies: [task-2]
+      - name: cleanup
+        template: cleanup-task
+        dependencies: [task-1]
+
+  - name: successful-task
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args:
+        - |
+          echo "Task 1: Starting process..."
+          sleep 1
+          echo "Task 1: Complete!"
+
+  - name: failing-task
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args:
+        - |
+          echo "Task 2: Starting critical operation..."
+          sleep 1
+          echo "Task 2: ERROR - Critical failure detected!"
+          echo "This task will intentionally fail"
+          exit 1
+
+  - name: never-runs
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args:
+        - |
+          echo "Task 3: This should never execute due to task-2 failure"
+
+  - name: cleanup-task
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args:
+        - |
+          echo "Cleanup: This runs regardless of task-2 failure"
+          echo "Performing cleanup operations..."
+          sleep 1
+          echo "Cleanup complete"
