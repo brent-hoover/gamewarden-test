@@ -82,11 +82,11 @@ tempo:
 
 kyverno:
   sourceType: helmRepo
-  enabled: true
+  enabled: false
 
 kyvernoPolicies:
   sourceType: helmRepo
-  enabled: true
+  enabled: false
   values:
     policies:
       restrict-volume-types:
@@ -184,7 +184,7 @@ grafana:
 
 addons:
   authservice:
-    enabled: true
+    enabled: false
     chains:
       APP:
         callback_uri: https://APP.gw.local/oauth_callback
@@ -222,7 +222,7 @@ addons:
         enabled: false
 
   keycloak:
-    enabled: true
+    enabled: false
     postRenderers:
       - kustomize:
           patchesStrategicMerge:
