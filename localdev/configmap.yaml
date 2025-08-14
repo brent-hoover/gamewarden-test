@@ -35,9 +35,15 @@ loki:
   values:
     minio:
       enabled: false
+    loki:
+      storage:
+        type: filesystem
     backend:
       replicas: 2
       affinity: {}
+      persistence:
+        enabled: true
+        size: 5Gi
     write:
       replicas: 1
       persistence:
