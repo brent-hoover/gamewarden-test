@@ -36,7 +36,8 @@ loki:
     minio:
       enabled: false
     backend:
-      replicas: 1
+      replicas: 2
+      affinity: {}
     write:
       replicas: 1
       persistence:
