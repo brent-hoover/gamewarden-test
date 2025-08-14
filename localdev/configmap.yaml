@@ -40,12 +40,22 @@ loki:
         type: filesystem
     backend:
       replicas: 2
-      affinity: {}
+      affinity:
+        podAntiAffinity: null
       persistence:
         enabled: true
         size: 5Gi
+      resources:
+        limits:
+          cpu: 200m
+          memory: 400Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
     write:
       replicas: 1
+      affinity:
+        podAntiAffinity: null
       persistence:
         size: 2Gi
       resources:
@@ -55,9 +65,10 @@ loki:
         requests:
           cpu: 100m
           memory: 256Mi
-      affinity: {}
     read:
       replicas: 1
+      affinity:
+        podAntiAffinity: null
       persistence:
         size: 2Gi
       resources:
@@ -67,7 +78,6 @@ loki:
         requests:
           cpu: 100m
           memory: 256Mi
-      affinity: {}
     extraObjects:
     - apiVersion: "security.istio.io/v1beta1"
       kind: PeerAuthentication
