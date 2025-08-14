@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+  annotations:
+    meta.helm.sh/release-name: bigbang
+    meta.helm.sh/release-namespace: bigbang
+  labels:
+    app.kubernetes.io/managed-by: Helm
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: argocd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+      name: redis
+      namespace: argocd
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.2.7
+          command:
+            - redis-server
+            - "/redis-master/redis.conf"
+          env:
+            - name: MASTER
+              value: "true"
+          ports:
+            - containerPort: 6379
+          resources:
+            limits:
+              cpu: "0.1"
+          volumeMounts:
+            - mountPath: /redis-master-data
+              name: data
+            - mountPath: /redis-master
+              name: config
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: redis-config
+            items:
+              - key: redis-config
+                path: redis.conf
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: argocd
+spec:
+  selector:
+    app: redis
+  type: ClusterIP
+  ports:
+    - name: tcp-redis
+      protocol: TCP
+      port: 6379
+      targetPort: redis
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: argocd
+  name: redis-config
+data:
+  redis-config: |
+    maxmemory 2mb
+    maxmemory-policy allkeys-lru    

@@ -76,6 +76,10 @@ promtail:
   sourceType: helmRepo
   enabled: true
 
+tempo:
+  sourceType: helmRepo
+  enabled: false
+
 kyverno:
   sourceType: helmRepo
   enabled: true
