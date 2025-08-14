@@ -31,22 +31,36 @@ monitoring:
 loki:
   sourceType: helmRepo
   enabled: true
-  strategy: monolithic
+  strategy: scalable
   values:
     minio:
       enabled: false
-    singleBinary:
+    backend:
+      replicas: 1
+    write:
       replicas: 1
       persistence:
-        enabled: true
-        size: 5Gi
+        size: 2Gi
       resources:
         limits:
-          cpu: 500m
-          memory: 1Gi
-        requests:
           cpu: 200m
-          memory: 512Mi
+          memory: 400Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+      affinity: {}
+    read:
+      replicas: 1
+      persistence:
+        size: 2Gi
+      resources:
+        limits:
+          cpu: 200m
+          memory: 400Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+      affinity: {}
     extraObjects:
     - apiVersion: "security.istio.io/v1beta1"
       kind: PeerAuthentication
