@@ -39,9 +39,16 @@ loki:
       storage:
         type: filesystem
     backend:
-      replicas: 1
+      replicas: 2
       affinity:
-        podAntiAffinity: null
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: backend
+              topologyKey: kubernetes.io/hostname
       persistence:
         enabled: true
         size: 5Gi
@@ -55,7 +62,14 @@ loki:
     write:
       replicas: 1
       affinity:
-        podAntiAffinity: null
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: write
+              topologyKey: kubernetes.io/hostname
       persistence:
         size: 2Gi
       resources:
@@ -68,7 +82,14 @@ loki:
     read:
       replicas: 1
       affinity:
-        podAntiAffinity: null
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: read
+              topologyKey: kubernetes.io/hostname
       persistence:
         size: 2Gi
       resources:
