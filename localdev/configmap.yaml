@@ -34,10 +34,14 @@ loki:
   strategy: scalable
   values:
     minio:
-      enabled: false
-    loki:
-      storage:
-        type: filesystem
+      enabled: true
+      replicas: 1
+      persistence:
+        size: 5Gi
+      resources:
+        requests:
+          memory: 128Mi
+          cpu: 100m
     backend:
       replicas: 2
       affinity:
