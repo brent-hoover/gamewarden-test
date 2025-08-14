@@ -39,7 +39,7 @@ loki:
       storage:
         type: filesystem
     backend:
-      replicas: 2
+      replicas: 1
       affinity:
         podAntiAffinity: null
       persistence:
@@ -241,6 +241,28 @@ addons:
           value: "redis:6379"
       redis-bb:
         enabled: false
+
+  argoWorkflows:
+    enabled: true
+    sso:
+      enabled: false
+    values:
+      controller:
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+      server:
+        resources:
+          requests:
+            memory: 128Mi
+            cpu: 100m
+          limits:
+            memory: 256Mi
+            cpu: 500m
 
   keycloak:
     enabled: false
